@@ -3210,7 +3210,8 @@ void wxAuiNotebook::OnTabDragMotion(wxAuiTabCtrl* src_tabs, int src_idx)
 
                 if (nb != this)
                 {
-                    m_mgr.UpdateHint(other_tabs->GetHintScreenRect());
+                    wxRect hint_rect = other_tabs->GetHintScreenRect();
+                    m_mgr.UpdateHint(wxRect(ScreenToClient(hint_rect.GetPosition()), hint_rect.GetSize()));
                     return;
                 }
             }
@@ -3256,10 +3257,11 @@ void wxAuiNotebook::OnTabDragMotion(wxAuiTabCtrl* src_tabs, int src_idx)
         }
 
         hintRect = dest_tabs->GetHintScreenRect();
+        ScreenToClient(&hintRect.x, &hintRect.y);
     }
     else
     {
-        hintRect = m_mgr.CalculateHintRect(m_dummyWnd, client_pt);
+        hintRect = m_mgr.CalculateWindowHintRect(m_dummyWnd, client_pt);
     }
 
     m_mgr.UpdateHint(hintRect);
@@ -3402,7 +3404,7 @@ void wxAuiNotebook::OnTabEndDrag(wxAuiTabCtrl* src_tabs, int src_idx)
         }
         else
         {
-            wxRect rect = m_mgr.CalculateHintRect(m_dummyWnd,
+            wxRect rect = m_mgr.CalculateWindowHintRect(m_dummyWnd,
                                                   mouse_client_pt);
             if (rect.IsEmpty())
             {

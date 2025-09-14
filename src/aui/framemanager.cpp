@@ -3258,16 +3258,21 @@ void wxAuiManager::OnHintFadeTimer(wxTimerEvent& WXUNUSED(event))
 
     m_hintFadeAmt++;
 
-    ShowHint(m_lastHint);
+    ShowWindowHint(m_lastHint);
 }
 
 void wxAuiManager::ShowHint(const wxRect& rectScreen)
 {
-    wxOverlayDC dc(m_overlay, m_frame);
-    dc.Clear();
-
     wxRect rect = rectScreen;
     m_frame->ScreenToClient(&rect.x, &rect.y);
+
+    ShowWindowHint(rect);
+}
+
+void wxAuiManager::ShowWindowHint(const wxRect& rect)
+{
+    wxOverlayDC dc(m_overlay, m_frame);
+    dc.Clear();
 
     wxDCClipper clip(dc, rect);
 
@@ -3410,7 +3415,7 @@ void wxAuiManager::StartPaneDrag(wxWindow* pane_window,
 // the mouse position, in client coordinates.  |offset| describes the offset
 // that the mouse is from the upper-left corner of the item being dragged
 
-wxRect wxAuiManager::CalculateHintRect(wxWindow* pane_window,
+wxRect wxAuiManager::DoCalculateHintRect(wxWindow* pane_window,
                                        const wxPoint& pt,
                                        const wxPoint& offset)
 {
@@ -3473,6 +3478,33 @@ wxRect wxAuiManager::CalculateHintRect(wxWindow* pane_window,
 
     delete sizer;
 
+    return rect;
+}
+
+wxRect wxAuiManager::CalculateWindowHintRect(wxWindow* pane_window,
+                                       const wxPoint& pt,
+                                       const wxPoint& offset)
+{
+    wxRect rect = DoCalculateHintRect(pane_window, pt, offset);
+    
+    if ( rect.IsEmpty() )
+        return rect;
+
+    if ( m_frame->GetLayoutDirection() == wxLayout_RightToLeft )
+    {
+        // Mirror rectangle in RTL mode
+        rect.x -= rect.GetWidth();
+    }
+
+    return rect;
+}
+
+wxRect wxAuiManager::CalculateHintRect(wxWindow* pane_window,
+                                       const wxPoint& pt,
+                                       const wxPoint& offset)
+{
+    wxRect rect = DoCalculateHintRect(pane_window, pt, offset);
+    
     if ( rect.IsEmpty() )
         return rect;
 
@@ -3495,7 +3527,7 @@ void wxAuiManager::DrawHintRect(wxWindow* pane_window,
                                 const wxPoint& pt,
                                 const wxPoint& offset)
 {
-    UpdateHint(CalculateHintRect(pane_window, pt, offset));
+    UpdateHint(CalculateWindowHintRect(pane_window, pt, offset));
 }
 
 void wxAuiManager::UpdateHint(const wxRect& rect)
@@ -3518,7 +3550,7 @@ void wxAuiManager::UpdateHint(const wxRect& rect)
         else
             m_hintFadeAmt = m_hintFadeMax;
 
-         ShowHint(rect);
+         ShowWindowHint(rect);
      }
 }
 

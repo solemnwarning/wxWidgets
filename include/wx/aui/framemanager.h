@@ -494,6 +494,12 @@ public:
                  wxWindow* paneWindow,
                  const wxPoint& offset);
 
+    wxRect CalculateWindowHintRect(
+                 wxWindow* paneWindow,
+                 const wxPoint& pt,
+                 const wxPoint& offset = wxPoint{});
+
+    wxDEPRECATED_MSG("Use CalculateWindowHintRect()")
     wxRect CalculateHintRect(
                  wxWindow* paneWindow,
                  const wxPoint& pt,
@@ -533,6 +539,11 @@ public:
 protected:
 
     void DoFrameLayout();
+    
+    wxRect DoCalculateHintRect(
+                 wxWindow* paneWindow,
+                 const wxPoint& pt,
+                 const wxPoint& offset = wxPoint{});
 
     void LayoutAddPane(wxSizer* container,
                        wxAuiDockInfo& dock,
@@ -581,6 +592,8 @@ protected:
     bool DoEndResizeAction(wxMouseEvent& event);
 
     void SetActivePane(wxWindow* active_pane);
+
+    void ShowWindowHint(const wxRect& window_rect);
 
 public:
 

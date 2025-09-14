@@ -5,6 +5,7 @@
 // Licence:     wxWindows licence
 /////////////////////////////////////////////////////////////////////////////
 
+#include <wx/defs.h>
 
 /**
     @todo wxAuiPaneInfo dock direction types used with wxAuiManager.
@@ -259,10 +260,30 @@ public:
         @param offset Describes the offset that the mouse is from the upper-left
             corner of the item being dragged, 0 by default (since wxWidgets
             3.3.0, this parameter had to be specified in the earlier versions).
+        @return The rectangle hint will be returned in window coordinates of the
+            managed window if the pane would indeed become docked at the
+            specified drop point. Otherwise, an empty rectangle is returned.
+    */
+    wxRect CalculateWindowHintRect(wxWindow* paneWindow,
+                             const wxPoint& pt,
+                             const wxPoint& offset = wxPoint{0, 0});
+
+    /**
+        This function is used by controls to calculate the drop hint rectangle.
+
+        The method first calls DoDrop() to determine the exact position the
+        pane would be at were if dropped.
+
+        @param paneWindow The window pointer of the pane being dragged.
+        @param pt The mouse position, in client coordinates.
+        @param offset Describes the offset that the mouse is from the upper-left
+            corner of the item being dragged, 0 by default (since wxWidgets
+            3.3.0, this parameter had to be specified in the earlier versions).
         @return The rectangle hint will be returned in screen coordinates if the pane
             would indeed become docked at the specified drop point.
             Otherwise, an empty rectangle is returned.
     */
+    wxDEPRECATED_MSG("Use CalculateWindowHintRect()")
     wxRect CalculateHintRect(wxWindow* paneWindow,
                              const wxPoint& pt,
                              const wxPoint& offset = wxPoint{0, 0});
